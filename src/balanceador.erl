@@ -1,6 +1,7 @@
 -module(balanceador).
 
--export([load/0, show/1, pick/1]).
+%-export([load/0, show/1, pick/1]).
+-compile(export_all).
 
 -define(TIMEOUT, 3000).
 
@@ -17,36 +18,23 @@ load_result(N) ->
 
 % Show load of all nodes
 show([]) ->
-    show([node()]);
-show(L) ->
-    {Results, _} = rpc:multicall(L, balancer, load, [], ?TIMEOUT),
-    [{Node, Load} || {load, Node, Load} <- Results].
+    show([nodes()]);
+show(NodeList) ->
+    {Results, BadNodes} = rpc:multicall(NodeList, balanceador, load, [], ?TIMEOUT),
+      {Results, BadNodes}.
+    %[{Node, Load} || {load, Node, Load} <- Results].
+    %lists:map(fun(X) -> X ! {balanceador, self()}, NodeList).
     %multicall -> recoge informacion de los servidores
 
-% Pick a node with lowest system load from list L.
-pick([]) ->
-    [N] = show([node()]),
-    N;
-pick(L) ->
-    case show(L) of
-        [] ->
-            pick([]);
-        [H|T] ->
-            N = select(H, T),
-            N
-    end.
+select_server(NodeList) ->
+  lok.%ists:map(fun(X) -> X ! {balanceador, self()}, NodeList).
 
-select(N, []) ->
-    N;
 
-select(N, L) ->
-    [H|T] = L,
-    {_,Load} = N,
-    {_,Load1} = H,
-    case Load1 < Load of
-	true ->
-	    N1 = H;
-	false ->
-	    N1 = N
-    end,
-select(N1, T).
+start(NodeList) ->
+  receive
+    {request, From} ->
+      io:format("Peticion nueva de  ~p~n",[From]),
+      select_server(NodeList), start(NodeList);
+    {carga, Carga} -> {carga, Carga}, start(NodeList);
+    _ -> fail
+  end.
