@@ -5,25 +5,19 @@
 
 -define(TIMEOUT, 3000).
 
-% Return node() system load.
-load() -> %1.
-    load_result(cpu_sup:avg1()). %int con la ultima carga(minuto) o  {error, reason} y 0 si no disponible
+is_process_alive() ->
+  {node(), self(), is_process_alive(self())}.
 
-load_result(0) ->
-    cpu_sup:start(), {load, node(), cpu_sup:avg1()};
-    %node() -> devuelve el nombre del nodo local
-
-load_result(N) ->
-    {load, node(), N}.
-
-
+imprimir(L) -> io:format("Lista de nodos vivos: ~tp ~n",[L]).
 
 select_server(NodeList, Cliente) ->
-  {Results, BadNodes} = rpc:multicall(NodeList, erlang, is_process_alive, [], ?TIMEOUT),
-  N = random:uniform(length(Results)), %escogemos un nodo aleatorio que va de 1 a N (long de la lista)
+  {Results, _BadNodes} = rpc:multicall(NodeList, balanceador, is_process_alive, [], ?TIMEOUT),
+  imprimir(Results),
+  N = rand:uniform(length(Results)), %escogemos un nodo aleatorio que va de 1 a N (long de la lista)
   io:format("Numero de nodo aleatorio: ~tp ~n",[N]),
-  Node = lists:nth(N, Results),
-  {servidor, Node} ! {peticion,Cliente}. %sacamos el nodo de la posicion aleatoria N
+  {Node, _, _} = lists:nth(N, Results),
+  io:format("Nodo elegido: ~tp ~n",[Node]),
+  {servidor, Node} ! {peticion, Cliente}. %sacamos el nodo de la posicion aleatoria N
 
 start(NodeList) ->
     register (balanceador, spawn (?MODULE, loop , [NodeList])), ok.
