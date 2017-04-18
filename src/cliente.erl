@@ -6,11 +6,8 @@
 
 calcular(Nodo) ->
   io:format("Enviada peticion...~n"),
-  {balanceado, Nodo} ! {peticion, self()},
-  waitResponse().
-
-
-waitResponse() ->
+ 
+  {balanceador, Nodo} ! {peticion, self()},
   io:format("Esperando respuesta...~n"),
   receive
     {respuesta, Resp} ->
