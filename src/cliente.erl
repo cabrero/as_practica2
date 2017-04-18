@@ -6,7 +6,7 @@
 
 calcular(Nodo) ->
   io:format("Enviada peticion...~n"),
-  {servidor, Nodo} ! {peticion, self()},
+  {balanceado, Nodo} ! {peticion, self()},
   waitResponse().
 
 
@@ -16,5 +16,5 @@ waitResponse() ->
     {respuesta, Resp} ->
     io:format("Respuesta recibida: ~s ~n",[Resp]);
     _ ->
-      respuesta_incorrecta
+      error
   end.

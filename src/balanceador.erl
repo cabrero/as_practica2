@@ -6,8 +6,8 @@
 -define(TIMEOUT, 3000).
 
 % Return node() system load.
-load() ->
-    load_result(cpu_sup:avg1()). %int con la ultima carga(minuto) o  {error, reason} y 0 si no disponible
+load() -> 1.
+    %load_result(cpu_sup:avg1()). %int con la ultima carga(minuto) o  {error, reason} y 0 si no disponible
 
 load_result(0) ->
     cpu_sup:start(), {load, node(), cpu_sup:avg1()};
@@ -22,19 +22,17 @@ show([]) ->
 show(NodeList) ->
     {Results, BadNodes} = rpc:multicall(NodeList, balanceador, load, [], ?TIMEOUT),
       {Results, BadNodes}.
-    %[{Node, Load} || {load, Node, Load} <- Results].
-    %lists:map(fun(X) -> X ! {balanceador, self()}, NodeList).
-    %multicall -> recoge informacion de los servidores
 
-select_server(NodeList) ->
-  lok.%ists:map(fun(X) -> X ! {balanceador, self()}, NodeList).
-
+select_server(NodeList, Client) ->
+  {Results, BadNodes} = rpc:multicall(NodeList, balanceador, load, [], ?TIMEOUT),
 
 start(NodeList) ->
+    register (balanceador, spawn ( fun loop/0 )), ok.
+
+loop(NodeList) ->
   receive
-    {request, From} ->
-      io:format("Peticion nueva de  ~p~n",[From]),
-      select_server(NodeList), start(NodeList);
-    {carga, Carga} -> {carga, Carga}, start(NodeList);
+    {request, Client} ->
+      io:format("Peticion nueva de  ~p~n",[Client]),
+      select_server(NodeList, Client), loop(NodeList);
     _ -> fail
   end.
