@@ -25,6 +25,16 @@ start(NodeList) ->
 addServer(Node) ->
    self()!{Node,nodo_nuevo}.
 
+activeNode(NodeList)->
+  case NodeList of
+    [] ->
+      "Error: no hay servidores que activar";
+    [{Nombre,off}|T]->
+      [{Nombre,on}|T];
+    [{N,on}|T]->
+      lists:append([{N,on}],activeNode(T))
+  end.
+
 loop(NodeList) ->
   receive
     {peticion, Cliente} ->
@@ -33,5 +43,20 @@ loop(NodeList) ->
     {Node,nodo_nuevo} ->
       NodeList2=NodeList++[Node],
       loop(NodeList2);
+    {active} ->
+      NodeList2=activeNode(NodeList),
+      loop(NodeList2);
+
     _ -> fail
   end.
+
+    %{despierta}->
+     % Node=hd(NodeListFree),
+      %NodeListFree2=lists:remove(Node,NodeListFree),
+      %NodeListUsed2=NodeListUsed++[Node],
+      %loop(NodeListUsed2, NodeListFree);
+    %{duerme}->
+     % Node=hd(NodeListUsed),
+      %NodeListUsed2=lists:remove(Node,NodeListUsed),
+      %NodeListUsed2=NodeListUsed++[Node],
+      %loop(NodeListUsed2, NodeListFree);
