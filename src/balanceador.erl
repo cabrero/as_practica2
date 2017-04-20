@@ -25,7 +25,7 @@ start(NodeList) ->
 addServer(Node) ->
    self()!{Node,nodo_nuevo}.
 
-loop(NodeListUsed) ->
+loop(NodeList) ->
   receive
     {peticion, Cliente} ->
       select_server(NodeList, Cliente),
