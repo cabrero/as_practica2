@@ -20,12 +20,18 @@ select_server(NodeList, Cliente) ->
   {servidor, Node} ! {peticion, Cliente}. %sacamos el nodo de la posicion aleatoria N
 
 start(NodeList) ->
-    register (balanceador, spawn (?MODULE, loop , [NodeList])), ok.
+  register (balanceador, spawn (?MODULE, loop , [NodeList])), ok.
 
-loop(NodeList) ->
+addServer(Node) ->
+   self()!{Node,nodo_nuevo}.
+
+loop(NodeListUsed) ->
   receive
     {peticion, Cliente} ->
       select_server(NodeList, Cliente),
       loop(NodeList);
+    {Node,nodo_nuevo} ->
+      NodeList2=NodeList++[Node],
+      loop(NodeList2);
     _ -> fail
   end.
