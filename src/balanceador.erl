@@ -22,9 +22,8 @@ select_server(NodeList, Cliente) ->
 start(NodeList) ->
   register (balanceador, spawn (?MODULE, loop , [NodeList])), ok.
 
-addServer(Node) ->
-   self()!{Node,nodo_nuevo}.
-
+addServer(Bal, Node) ->
+   {balanceador, Bal} ! {Node,nodo_nuevo}.
 activeNode(NodeList)->
   case NodeList of
     [] ->
@@ -51,7 +50,9 @@ loop(NodeList) ->
       select_server(NodeList, Cliente),
       loop(NodeList);
     {Node,nodo_nuevo} ->
+      io:format("ENTRO"),
       NodeList2=NodeList++[Node],
+       io:format("NodeList ~tp ~n", [NodeList2]),
       loop(NodeList2);
     {active} ->
       NodeList2=activeNode(NodeList),

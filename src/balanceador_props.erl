@@ -11,12 +11,11 @@
 nprocs() ->
     integer(1, inf). % xerar números > 0 -> probas positivas
 nodos() ->
-    oneof([b@CristobalRG96,
-           c@CristobalRG96]).
+    oneof([b1@MBP]).
 
 %% Propiedade xeral
 prop_cliente() ->
-    ?FORALL({Nodos,T}, {nodos(), 0},
+    ?FORALL({Nodos,T}, {[b1@MBP], 0},
             begin
                 Tracer = start_tracing(),
                 ok = ?TEST_MODULE:calcular(Nodos,T),
@@ -39,11 +38,14 @@ prop_cliente() ->
 envio(Trazas) ->
     SendersAndReceivers = [{From, To} || {trace, From, send, {peticion, _}, To} <- Trazas],
     length(SendersAndReceivers) == 1.
+    % io:format("SendersAndReceivers ~tp ~n", [length(SendersAndReceivers)]), true.
 
 % (3) Comprobamos que se recibe a mensaxe o número de veces axeitado
 recepcion(Trazas) ->
-    Receivers = [{Who, What} || {trace, Who, 'receive', {respuesta, _}} <- Trazas],
+    Receivers = [{Who, What} || {trace, Who, 'receive', {respuesta, What}} <- Trazas],
     length(Receivers) == 1.
+    % io:format("Receivers ~tp ~n", [length(Receivers)]), true.
+
 
 % (4) Comprobamos que se destrúen os procesos
 %destruccion(NProcs, Trazas) ->
