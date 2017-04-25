@@ -20,7 +20,7 @@ select_server(NodeList, Cliente) ->
   {servidor, Node} ! {peticion, Cliente}. %sacamos el nodo de la posicion aleatoria N
 
 start(NodeList) ->
-  register (balanceador, spawn (?MODULE, loop , [NodeList])), ok.
+  register (balanceador, spawn (?MODULE, loop , [[{Node, on} || Node <- NodeList]])), ok.
 
 addServer(Bal, Node) ->
    {balanceador, Bal} ! {Node,nodo_nuevo}.
@@ -44,10 +44,13 @@ inactiveNode(NodeList)->
       lists:append([{N,off}],inactiveNode(T))
   end.
 
+addServerInactive(Bal) ->
+  {balanceador, Bal} ! {inactive}.
+
 loop(NodeList) ->
   receive
     {peticion, Cliente} ->
-      select_server(NodeList, Cliente),
+      select_server([{Nodes, on} || {Nodes, on} <- NodeList], Cliente),
       loop(NodeList);
     {Node,nodo_nuevo} ->
       io:format("ENTRO"),
@@ -58,7 +61,12 @@ loop(NodeList) ->
       NodeList2=activeNode(NodeList),
       loop(NodeList2);
     {inactive} ->
-      NodeList2=inactiveNode(NodeList),
+      Lista = [{Nodes, on} || {Nodes, on} <- NodeList],
+      case length(Lista) of
+        1 -> io:format("Solo hay un servidor activo"),
+        NodeList2 = NodeList;
+        _ ->NodeList2=inactiveNode(NodeList)
+      end,
       loop(NodeList2);
 
     _ -> fail
