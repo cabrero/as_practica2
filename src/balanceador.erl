@@ -35,6 +35,16 @@ activeNode(NodeList)->
       lists:append([{N,on}],activeNode(T))
   end.
 
+inactiveNode(NodeList)->
+  case NodeList of
+    [] ->
+      "Error: no hay servidores que desactivar";
+    [{Nombre,on}|T]->
+      [{Nombre,off}|T];
+    [{N,off}|T]->
+      lists:append([{N,off}],inactiveNode(T))
+  end.
+
 loop(NodeList) ->
   receive
     {peticion, Cliente} ->
@@ -45,6 +55,9 @@ loop(NodeList) ->
       loop(NodeList2);
     {active} ->
       NodeList2=activeNode(NodeList),
+      loop(NodeList2);
+    {inactive} ->
+      NodeList2=inactiveNode(NodeList),
       loop(NodeList2);
 
     _ -> fail
