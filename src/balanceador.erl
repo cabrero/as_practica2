@@ -62,14 +62,3 @@ loop(NodeList) ->
 
     _ -> fail
   end.
-
-    %{despierta}->
-     % Node=hd(NodeListFree),
-      %NodeListFree2=lists:remove(Node,NodeListFree),
-      %NodeListUsed2=NodeListUsed++[Node],
-      %loop(NodeListUsed2, NodeListFree);
-    %{duerme}->
-     % Node=hd(NodeListUsed),
-      %NodeListUsed2=lists:remove(Node,NodeListUsed),
-      %NodeListUsed2=NodeListUsed++[Node],
-      %loop(NodeListUsed2, NodeListFree);
