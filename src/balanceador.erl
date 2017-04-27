@@ -24,10 +24,11 @@ start(NodeList) ->
 
 addServer(Bal, Node) ->
    {balanceador, Bal} ! {Node,nodo_nuevo}.
+
 activeNode(NodeList)->
   case NodeList of
     [] ->
-      "Error: no hay servidores que activar";
+      [];
     [{Nombre,off}|T]->
       [{Nombre,on}|T];
     [{N,on}|T]->
@@ -37,7 +38,7 @@ activeNode(NodeList)->
 inactiveNode(NodeList)->
   case NodeList of
     [] ->
-      "Error: no hay servidores que desactivar";
+      [];
     [{Nombre,on}|T]->
       [{Nombre,off}|T];
     [{N,off}|T]->
@@ -47,6 +48,9 @@ inactiveNode(NodeList)->
 addServerInactive(Bal) ->
   {balanceador, Bal} ! {inactive}.
 
+addServerActive(Bal) ->
+  {balanceador, Bal} ! {active}.
+
 loop(NodeList) ->
   receive
     {peticion, Cliente} ->
@@ -54,20 +58,29 @@ loop(NodeList) ->
       loop(NodeList);
     {Node,nodo_nuevo} ->
       io:format("ENTRO"),
-      NodeList2=NodeList++[Node],
-       io:format("NodeList ~tp ~n", [NodeList2]),
+      NodeList2=NodeList++[{Node,off}],
+      io:format("NodeList ~tp ~n", [NodeList2]),
       loop(NodeList2);
     {active} ->
-      NodeList2=activeNode(NodeList),
-      loop(NodeList2);
+      Lista = [{Nodes, off} || {Nodes, off} <- NodeList],
+      Lista2 = [{Nodes, on} || {Nodes, on} <- NodeList],
+      NodeList2=activeNode(Lista),
+      NodeList3=NodeList2++Lista2,
+      io:format("~tp~n",[NodeList3]),
+      loop(NodeList3);
     {inactive} ->
       Lista = [{Nodes, on} || {Nodes, on} <- NodeList],
+      Lista2 = [{Nodes, off} || {Nodes, off} <- NodeList],
       case length(Lista) of
+        0 -> io:format("No hay ningun servidor activo"),
+             NodeList2 = Lista;
         1 -> io:format("Solo hay un servidor activo"),
-        NodeList2 = NodeList;
-        _ ->NodeList2=inactiveNode(NodeList)
+             NodeList2 = Lista;
+        _ -> NodeList2=inactiveNode(NodeList)
       end,
-      loop(NodeList2);
+      NodeList3=NodeList2++Lista2,
+      io:format("~tp~n",[NodeList3]),
+      loop(NodeList3);
 
     _ -> fail
   end.
