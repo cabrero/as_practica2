@@ -11,11 +11,11 @@
 nprocs() ->
     integer(1, inf). % xerar números > 0 -> probas positivas
 nodos() ->
-    oneof([b1@MBP]).
+    oneof([b@cristobal]).
 
 %% Propiedade xeral
-prop_cliente() ->
-    ?FORALL({Nodos,T}, {[b1@MBP], 0},
+prop_cliente(Bal) ->
+    ?FORALL({Nodos,T}, {Bal, 0},
             begin
                 Tracer = start_tracing(),
                 ok = ?TEST_MODULE:calcular(Nodos,T),

@@ -11,6 +11,7 @@ is_process_alive() ->
 imprimir(L) -> io:format("Lista de nodos vivos: ~tp ~n",[L]).
 
 select_server(NodeList, Cliente) ->
+  io:format("Lista ~tp~n",[NodeList]),
   {Results, _BadNodes} = rpc:multicall(NodeList, balanceador, is_process_alive, [], ?TIMEOUT),
   imprimir(Results),
   N = rand:uniform(length(Results)), %escogemos un nodo aleatorio que va de 1 a N (long de la lista)
@@ -54,7 +55,7 @@ addServerActive(Bal) ->
 loop(NodeList) ->
   receive
     {peticion, Cliente} ->
-      select_server([{Nodes, on} || {Nodes, on} <- NodeList], Cliente),
+      select_server([Node || {Node,on} <- NodeList], Cliente),
       loop(NodeList);
     {Node,nodo_nuevo} ->
       io:format("ENTRO"),
