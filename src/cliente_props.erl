@@ -15,10 +15,10 @@ nodos() ->
 
 %% Propiedade xeral
 prop_cliente(Bal) ->
-    ?FORALL({Nodos,T}, {Bal, 0},
+    ?FORALL({Nodos}, {Bal},
             begin
                 Tracer = start_tracing(),
-                ok = ?TEST_MODULE:calcular(Nodos,T),
+                ok = ?TEST_MODULE:calcular(Nodos),
                 timer:sleep(10), % agardamos algo de tempo para que o anel transmita as mensaxes
                                                   % e rematar de recoller as trazas
                 Trazas = stop_tracing(Tracer),

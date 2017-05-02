@@ -77,7 +77,7 @@ loop(NodeList) ->
              NodeList2 = Lista;
         1 -> io:format("Solo hay un servidor activo"),
              NodeList2 = Lista;
-        _ -> NodeList2=inactiveNode(NodeList)
+        _ -> NodeList2=inactiveNode(Lista)
       end,
       NodeList3=NodeList2++Lista2,
       io:format("~tp~n",[NodeList3]),

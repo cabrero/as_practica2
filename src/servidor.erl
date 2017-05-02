@@ -9,7 +9,9 @@ loop() ->
     receive
         {peticion, Origen} ->
             io:format("Peticion de ~p~n", [Origen]),
-            Origen ! {respuesta, hola},
+            Time =rand:uniform(500),
+            timer:sleep(Time),
+            Origen ! {respuesta, Time},
             loop();
         terminar ->
             io:format("terminar");
