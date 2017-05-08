@@ -1,6 +1,4 @@
 -module(cliente).
-
-%-export([start/0, start/1, calculate/1]).
 -compile(export_all).
 -define(TIMEOUT, 3000).
 

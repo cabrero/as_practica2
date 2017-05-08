@@ -1,5 +1,4 @@
 -module(servidor).
-%-export([start/0, loop/0]).
 -compile(export_all).
 
 start() ->
@@ -14,7 +13,7 @@ loop() ->
             Origen ! {respuesta, Time},
             loop();
         terminar ->
-            io:format("terminar");
+            io:format("Terminar");
         Otracosa ->
             io:format("Peticion incorrecta: ~p~n", [Otracosa]),
             loop()

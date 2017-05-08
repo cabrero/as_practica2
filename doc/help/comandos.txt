@@ -1,4 +1,0 @@
-Lanzar pingclient:
-	erl -sname ping -setcookie 1234
-Lanzar pongserver:
-	erl -sname pong -setcookie 1234 

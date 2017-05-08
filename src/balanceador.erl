@@ -1,8 +1,5 @@
 -module(balanceador).
-
-%-export([load/0, show/1, pick/1]).
 -compile(export_all).
-
 -define(TIMEOUT, 3000).
 
 is_process_alive() ->
@@ -58,7 +55,6 @@ loop(NodeList) ->
       select_server([Node || {Node,on} <- NodeList], Cliente),
       loop(NodeList);
     {Node,nodo_nuevo} ->
-      io:format("ENTRO"),
       NodeList2=NodeList++[{Node,off}],
       io:format("NodeList ~tp ~n", [NodeList2]),
       loop(NodeList2);
@@ -84,4 +80,5 @@ loop(NodeList) ->
       loop(NodeList3);
 
     _ -> fail
+    
   end.
