@@ -11,7 +11,7 @@
 nprocs() ->
     integer(1, inf). % xerar números > 0 -> probas positivas
 nodos() ->
-    oneof([b@cristobal]).
+    oneof([b@MBP]).
 
 %% Propiedade xeral
 prop_cliente(Bal) ->
@@ -19,7 +19,7 @@ prop_cliente(Bal) ->
             begin
                 Tracer = start_tracing(),
                 ok = ?TEST_MODULE:calcular(Nodos),
-                timer:sleep(10), % agardamos algo de tempo para que o anel transmita as mensaxes
+                timer:sleep(1500), % agardamos algo de tempo para que o anel transmita as mensaxes
                                                   % e rematar de recoller as trazas
                 Trazas = stop_tracing(Tracer),
                 ?WHENFAIL(io:format("Trazas: ~p~n", [Trazas]),
@@ -38,7 +38,7 @@ prop_cliente(Bal) ->
 envio(Trazas) ->
     SendersAndReceivers = [{From, To} || {trace, From, send, {peticion, _}, To} <- Trazas],
     length(SendersAndReceivers) == 1.
-    % io:format("SendersAndReceivers ~tp ~n", [length(SendersAndReceivers)]), true.
+     %io:format("SendersAndReceivers ~tp ~n", [length(SendersAndReceivers)]), true.
 
 % (3) Comprobamos que se recibe a mensaxe o número de veces axeitado
 recepcion(Trazas) ->
@@ -81,6 +81,6 @@ tracer(TraceList) ->
     receive
         {collect, From} ->
             From ! {lists:reverse(TraceList), self()};
-        Other -> 
+        Other ->
             tracer([Other|TraceList])
     end.
